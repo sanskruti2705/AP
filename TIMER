@@ -1,0 +1,22 @@
+#include <lpc214x.h>
+
+void Tdelay(unsigned int t){
+	T0PR = 14999; //set the maximum count
+	T0TC = 0; // set as 0 before starting the timer
+	T0TCR = 0X01; //enable Timer counter and Prescale counter
+	while(T0TC < t); //wait until T0TC reaches specified delay 't'
+	T0TCR = 0x00;	//disable TC and PC
+}	
+
+int main(){
+	PINSEL2 = 0x00000000; //configure port 1 as GPIO pins
+	IODIR1 = 0XFF000000; //configures IODIR as output
+	
+	while(1){
+		IOSET1 = 0XFF000000; //setting port pin value as HIGH
+		Tdelay(1000);
+		IOCLR1 = 0XFF000000; //clears the data,(port pin � LOW)
+		Tdelay(1000);
+	}
+}
+
