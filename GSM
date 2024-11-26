@@ -1,0 +1,137 @@
+DELAY
+void delay(unsigned int t){
+	unsigned int i,j;
+	for(i=0;i<275;i++){
+		for(j=0;j<t;j++){
+		}
+	}
+}
+
+UART0
+#include<lpc214x.h>
+
+void uart_init(){
+	PINSEL0 |=0X00000005; // set TxD, RxD pins of UART0
+	U0FCR=0X07; // enable and reset UART0 FIFO
+	U0LCR=0X83; // enable DLAB to set DLL, DLM
+	U0DLL=0X62; // set the baud rate to 9600
+	U0DLM=0x00;
+	U0LCR=0X03; // disable DLAB
+}
+
+unsigned char UART0_PutChar(unsigned char ch)
+{
+	if(ch == '\n'){ // check if character is new line
+		while(!(U0LSR & 0x20)); // wait until uart0 transmitter is ready
+		U0THR = 0x0D; // carriage return
+	}
+	while(!(U0LSR & 0x20)); 
+	return (U0THR = ch); // transmit the character
+}
+
+unsigned char UART0_GetChar(void)
+{
+	while(!(U0LSR & 0x01)); // wait until uart0 receiver has data
+	return (U0RBR); // return the received character
+}
+
+void UART0_S(unsigned char *ch)
+{
+	while(*ch){
+		UART0_PutChar(*ch++); // transmit each character in the string
+	}
+}
+
+
+
+UART1
+#include <lpc214x.h>
+
+void uart1_init()
+{
+	PINSEL0 |= 0x00050000; // set TxD, RxD pins of UART1
+	U1FCR = 0x07; // enable and reset UART FIFO
+	U1LCR = 0x83; // enable DLAB to set DLL, DLM
+	U1DLL = 0X62; // set the baud rate to 9600
+	U1DLM = 0;
+	U1LCR = 0X03; // disable DLAB
+}
+
+unsigned char UART1_PutChar(unsigned char ch)
+{
+	if(ch == '\n'){ // check if character is new line
+		while(!(U1LSR & 0x20));// wait until uart1 transmitter is ready
+		U1THR = 0x0D; // carriage return
+	}
+	while(!(U1LSR & 0x20));
+	return(U1THR = ch); // transmit the character
+}
+
+unsigned char UART1_GetChar(void)
+{
+	while(!(U1LSR & 0x01)); // wait until uart1 receiver has data
+	return (U1RBR); // return the received character
+}
+
+void UART1_S(unsigned char *ch)
+{
+	while(*ch){
+		UART1_PutChar(*ch++); // transmit each character in the string
+	}
+}
+
+
+
+
+MAIN
+#include <lpc214x.h>
+#include "UART_INIT.c"
+#include "UART1_init.c"
+#include "delay.c"
+
+unsigned char msg_1[]="GSM program started. UART initialised\n";
+unsigned char AT_cmd[]="AT\n\r"; // AT command to check communication with GSM module
+unsigned char ATD_str[]="ATD09309851539;\n\r"; // AT command to dial a phone number
+unsigned char ATH_str[]="ATH0\n\r"; // AT command to hang up the call
+unsigned char cmgf[]="AT+CMGF=1\n\r"; // AT command to set SMS mode
+unsigned char cmgs[]="AT+CMGS=\"09309851539\"\n\r"; // send SMS to GSM phone
+unsigned char ctrl_z=0x1A; // to check for end of line
+unsigned char txt[]="Hi, how are you?";
+unsigned char txt_1[]="\n\r";
+unsigned char txt_2[]="Task Finished";
+
+int main()
+{
+	uart_init(); // UART0 Initialization
+	uart1_init(); // UART1 Initialization
+	UART0_S(msg_1); // transmit message to UART0
+	UART1_S(AT_cmd); // send AT command to GSM using UART1
+	UART0_S(AT_cmd); // transmit command to UART0
+	delay(1);
+	UART1_S(ATD_str); // send AT command to dial phone number
+	UART0_S(ATD_str);
+	delay(30000);
+	
+	UART1_S(ATH_str); // send AT command to hang up call
+	UART0_S(ATH_str);
+	delay(3000);
+	UART1_S(cmgf); // AT command to set SMS mode
+	UART0_S(cmgf);
+	delay(3000);
+	UART1_S(cmgs); // send SMS to GSM phone
+	UART0_S(cmgs);
+	delay(10000);
+  UART1_S(txt); // send text message
+	UART0_S(txt);
+	delay(3000);
+	UART1_PutChar(ctrl_z);
+	UART0_PutChar(ctrl_z);
+	UART1_S(txt_1);
+	UART0_S(txt_1);
+	UART1_S(txt_2);
+	UART0_S(txt_2);
+	delay(100);
+	while(1);
+	return 0;
+}
+
