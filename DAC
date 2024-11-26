@@ -1,0 +1,110 @@
+SQUARE
+#include <lpc214x.h>
+#include "delay.c"
+#define mask 0x0000FFC0 // set output bits for DAC
+#define shift 6
+
+void DAC_INIT()
+{
+	PINSEL1 |= 1<<19; //set P0.25 as DAC output
+	DACR = 1<<16; // set bias settling time:2.5us, max current:350uA
+}
+
+void main()
+{
+	DAC_INIT(); // initialize DAC
+	while(1)
+	{
+		DACR = 0x00000000; // set DAC output as low
+		delay(10);
+		DACR = mask; // set DAC output as high
+		delay(10);
+	}
+}
+
+
+TRIANGULAR
+#include <lpc214x.h>
+#define mask 0x0000FFC0 // set output bits for DAC
+#define shift 6
+
+void DAC_INIT()
+{
+	PINSEL1 |= 1<<19; //set P0.25 as DAC output
+	DACR = 1<<16; // set bias settling time:2.5us, max current:350uA
+}
+
+void main()
+{
+	unsigned int i;
+	DAC_INIT(); // initialize DAC
+	while(1)
+	{
+		for(i=0;i<1024;i++) // incrementing DAC value
+		{
+			DACR = (i<<shift) & mask; // load the DAC value by shifting and applying mask
+		}
+		for(i=1023;i>0;i--) // decrement DAC value
+		{
+			DACR = (i<<shift) & mask; // load the DAC value by shifting and applying mask
+		}
+	}
+}
+
+SAWTOOTH
+#include <lpc214x.h>
+#define mask 0x0000FFC0 // set output bits for DAC
+#define shift 6
+
+void DAC_INIT()
+{
+	PINSEL1 |= 1<<19; //set P0.25 as DAC output
+	DACR = 1<<16; // set bias settling time:2.5us, max current:350uA
+}
+
+void main()
+{
+	unsigned int i;
+	DAC_INIT(); // initialize DAC
+	while(1)
+	{
+		for(i=1023;i>0;i--) // decrement DAC value
+		{
+			DACR = (i<<shift) & mask; // load the DAC value by shifting and applying mask
+		}
+	}
+}
+
+
+STAIRCASE
+#include <lpc214x.h>
+#include "delay.c"
+#define mask 0x0000FFC0 // set output bits for DAC
+#define shift 6
+
+void DAC_INIT()
+{
+	PINSEL1 |= 1<<19; //set P0.25 as DAC output
+	DACR = 1<<16; // set bias settling time:2.5us, max current:350uA
+}
+
+void main()
+{
+	unsigned int i;
+	DAC_INIT(); // initialize DAC
+	while(1)
+	{
+		for(i=0;i<1024;i=i+341) // increment DAC value by 341 for 3 steps
+		{
+			DACR = (i<<shift) & mask; // load the DAC value by shifting and applying mask
+			delay(10);
+		}
+		for(i=682;i>0;i=i-341) // decrement DAC value by 341 for 3 steps
+		{
+			DACR = (i<<shift) & mask; // load the DAC value by shifting and applying mask
+			delay(10);
+		}
+	}
+}
+
+
