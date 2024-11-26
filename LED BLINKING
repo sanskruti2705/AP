@@ -1,0 +1,122 @@
+ON OFF
+#include <lpc214x.h>
+void delay(unsigned int t){
+	unsigned int i,j;
+	for(i=0;i<275;i++){
+		for(j=0;j<t;j++){
+		}
+	}
+}
+int main(){
+	PINSEL2 = 0x00000000; //configuring Port 1 pins P1.16-P1.31
+	IODIR1 = 0xFF000000; //configures IODIR as output
+	while(1){ //for infinite loop
+		IOSET1 = 0xFF000000; //setting port pin value as HIGH
+		delay(20000);
+		IOCLR1 = 0xFF000000; //clears the data,(makes port pin LOW)
+		delay(20000);
+	}
+}
+
+
+ALTERNATE
+#include <lpc214x.h>
+void delay(unsigned int t){
+	unsigned int i,j;
+	for(i=0;i<275;i++){
+		for(j=0;j<t;j++){
+		}
+	}
+}
+int main(){
+	unsigned int a,k;
+	PINSEL2 = 0x00000000;
+	IODIR1 = 0xFF000000;
+	while(1){
+		a = 0xAA000000;
+		for (k=0; k<2; k++){
+			IOSET1 = a>>k; //right shift a by k 
+			delay(20000);
+			IOCLR1 = 0xFF000000;
+			delay(20000);	
+		}
+	}
+}
+
+CURTAINS
+#include <lpc214x.h>
+void delay(unsigned int t){
+	unsigned int i,j;
+	for(i=0;i<275;i++){
+		for(j=0;j<t;j++){
+		}
+	}
+}
+int main(){
+	unsigned int a,b,c,k;
+	PINSEL2 = 0x00000000;
+	IODIR1 = 0xFF000000;
+	while(1){
+		c = 0x81000000;
+		for (k=0; k<=7; k++){
+			a = c << k; //left shift c by k
+			b = c >> k; //right shift c by k
+			IOSET1 = a|b; 
+			delay(10000);
+			IOCLR1 = 0xFF000000;
+			delay(10000);
+		}
+	}
+}
+
+
+LEFT SHIFT
+#include <lpc214x.h>
+void delay(unsigned int t){
+	unsigned int i,j;
+	for(i=0;i<275;i++){
+		for(j=0;j<t;j++){
+		}
+	}
+}
+int main(){
+	unsigned int a,k;
+	PINSEL2 = 0x00000000;
+	IODIR1 = 0xFF000000;
+	while(1){
+		a = 0x03000000;
+		for (k=0; k<7; k++){
+			IOSET1 = a<<k; //left shift a by k
+			delay(20000);
+			IOCLR1 = 0xFF000000;
+			delay(20000);		
+		}
+	}
+}
+
+
+RIGHT SHIFT
+#include <lpc214x.h>
+void delay(unsigned int t){
+	unsigned int i,j;
+	for(i=0;i<275;i++){
+		for(j=0;j<t;j++){
+		}
+	}
+}
+int main(){
+	unsigned int a,k;
+	PINSEL2 = 0x00000000;
+	IODIR1 = 0xFF000000;
+	while(1){
+		a = 0xC0000000;
+		for (k=0; k<7; k++){
+			IOSET1 = a>>k; //right shift a by k 
+			delay(20000);
+			IOCLR1 = 0xFF000000;
+			delay(20000);		
+		}
+	}
+}
+
+
