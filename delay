@@ -1,0 +1,7 @@
+void delay(unsigned int t){
+	unsigned int i,j;
+	for(i=0;i<275;i++){
+		for(j=0;j<t;j++){
+		}
+	}
+}
