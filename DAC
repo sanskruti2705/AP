@@ -4,6 +4,14 @@ SQUARE
 #define mask 0x0000FFC0 // set output bits for DAC
 #define shift 6
 
+void delay(unsigned int t){
+	unsigned int i,j;
+	for(i=0;i<275;i++){
+		for(j=0;j<t;j++){
+		}
+	}
+}
+
 void DAC_INIT()
 {
 	PINSEL1 |= 1<<19; //set P0.25 as DAC output
